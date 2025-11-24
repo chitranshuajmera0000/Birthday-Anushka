@@ -103,3 +103,37 @@ html, body, #root { height: 100%; }
 ::-webkit-scrollbar-thumb:hover {
 	background: linear-gradient(to bottom, #db2777, #7c3aed);
 }
+
+/* Per-image focus helper: set CSS variables on the <img> to control object-position
+	 and a small vertical nudge. Edit these per-image inline in App.jsx.
+	 Example: style={{ '--obj-pos': 'center 40%', '--obj-nudge': '-6%' }} */
+.photo-var {
+  /* separate horizontal and vertical object-position variables so you can
+	  tweak left/right independently per image: --obj-x and --obj-y */
+  object-position: var(--obj-x, center) var(--obj-y, 35%);
+  /* Avoid using transform translate to nudge images — transforms can reveal
+	  background edges when the image is moved. Use object-position only so
+	  the image always fully covers the box (no white bars). */
+  transition: object-position 220ms ease;
+}
+
+/* For small screens, use safer defaults unless overridden per-image */
+@media (max-width: 420px) {
+	.photo-var { object-position: var(--obj-x, center) var(--obj-y, 28%); }
+}
+
+/* Desktop default — slightly lower focal point to avoid chopping forehead */
+@media (min-width: 1024px) {
+	.photo-var { object-position: var(--obj-x, center) var(--obj-y, 40%); }
+}
+
+/* (sway feature removed) */
+
+/* Candle position helpers for Cake page: move the numeric overlays slightly higher on small screens */
+.candle-pos-1 { left: 38%; top: -2%; }
+.candle-pos-7 { left: 62%; top: -2%; }
+
+@media (max-width: 640px) {
+	.candle-pos-1 { top: -14%; }
+	.candle-pos-7 { top: -14%; }
+}
