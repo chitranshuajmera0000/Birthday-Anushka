@@ -309,96 +309,8 @@ const BirthdayWebsite = () => {
       { id: 6, url: 'https://res.cloudinary.com/dxj9gigbq/image/upload/v1763925924/6_libuwg.jpg', caption: "Bhakti Mode ON 📸" }
     ];
 
-    // Per-image focus state used by the live editor. Values are strings that will be
-    // applied as CSS variables on the <img> elements: --obj-x and --obj-y (e.g. 'center', '40%').
-    // Initialize from localStorage if the user previously saved edits in the browser.
-    const defaultFocus = [
-      { x: 'center', y: '35%' },
-      { x: 'right', y: '35%' },
-      { x: 'center', y: '40%' },
-      { x: 'center', y: '35%' },
-      { x: 'center', y: '32%' },
-      { x: 'center', y: '38%' }
-    ];
-
-    const [focusMap, setFocusMap] = useState(() => {
-      try {
-        const raw = localStorage.getItem('anushka.focusMap');
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length === defaultFocus.length) return parsed;
-        }
-      } catch (e) {
-        // ignore and fall back to defaults
-      }
-      return defaultFocus;
-    });
-
-    // Persist any edits to focusMap into localStorage so edits survive reloads
-    useEffect(() => {
-      try {
-        localStorage.setItem('anushka.focusMap', JSON.stringify(focusMap));
-      } catch (e) {
-        // ignore storage errors (e.g., private mode)
-      }
-    }, [focusMap]);
-
-    const [editorOpen, setEditorOpen] = useState(false);
-    const [selectedIndex, setSelectedIndex] = useState(0); // 0-based index for images
-
-    const updateFocus = (idx, key, value) => {
-      setFocusMap(prev => {
-        const copy = prev.slice();
-        copy[idx] = { ...copy[idx], [key]: value };
-        return copy;
-      });
-    };
-
-    const copyInline = (idx) => {
-      const f = focusMap[idx];
-      const text = `style={{ '--obj-x': '${f.x}', '--obj-y': '${f.y}' }}`;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text);
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-      }
-      try { alert('Copied: ' + text); } catch (e) {}
-    };
-
-    // Export all inline style snippets for the images so they can be pasted
-    // directly into the source file for production. Also provide a download
-    // fallback for offline replacement.
-    const exportAllInline = () => {
-      try {
-        const lines = focusMap.map((f, i) => {
-          return `/* Photo ${i + 1} */ style={{ '--obj-x': '${f.x}', '--obj-y': '${f.y}' }}`;
-        });
-        const content = `/* Paste these inline style attributes into the corresponding <img> tags in src/App.jsx */\n\n` + lines.join('\n');
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(content);
-          alert('Copied all inline style snippets to clipboard. Paste into src/App.jsx.');
-          return;
-        }
-        // Fallback: create a downloadable blob
-        const blob = new Blob([content], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'anushka-focus-inline.txt';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        alert('Downloaded focus snippets as anushka-focus-inline.txt');
-      } catch (e) {
-        alert('Unable to export inline styles automatically. You can still copy each style manually.');
-      }
-    };
+    // Production: baked inline focus values are used for all images.
+    // The editing UI and localStorage persistence have been removed for production builds.
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200 p-4 sm:p-8">
@@ -436,7 +348,7 @@ const BirthdayWebsite = () => {
             {/* Card 3 */}
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 hover:rotate-2 transition-all duration-300 animate-fadeIn" style={{ animationDelay: `0.3s` }}>
               <div className="h-48 sm:h-64 bg-gray-100 flex items-center justify-center overflow-hidden">
-                        <img src="https://res.cloudinary.com/dxj9gigbq/image/upload/v1763925923/3_wsyj2s.jpg" alt="Photo 3" className="w-full h-48 sm:h-64 object-cover photo-var" style={{ '--obj-x': focusMap[2].x, '--obj-y': focusMap[2].y }} />
+                        <img src="https://res.cloudinary.com/dxj9gigbq/image/upload/v1763925923/3_wsyj2s.jpg" alt="Photo 3" className="w-full h-48 sm:h-64 object-cover photo-var" style={{ '--obj-x': 'center', '--obj-y': '40%' }} />
               </div>
               <div className="p-4 sm:p-6 bg-white">
                 <p className="text-center text-base sm:text-lg font-semibold text-purple-600">Bootiphool Apsara! ✨</p>
@@ -466,7 +378,7 @@ const BirthdayWebsite = () => {
             {/* Card 6 */}
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 hover:rotate-2 transition-all duration-300 animate-fadeIn" style={{ animationDelay: `0.75s` }}>
               <div className="h-48 sm:h-64 bg-gray-100 flex items-center justify-center overflow-hidden">
-                        <img src="https://res.cloudinary.com/dxj9gigbq/image/upload/v1763925924/6_libuwg.jpg" alt="Photo 6" className="w-full h-48 sm:h-64 object-cover photo-var" style={{ '--obj-x': focusMap[5].x, '--obj-y': focusMap[5].y }} />
+                        <img src="https://res.cloudinary.com/dxj9gigbq/image/upload/v1763925924/6_libuwg.jpg" alt="Photo 6" className="w-full h-48 sm:h-64 object-cover photo-var" style={{ '--obj-x': 'center', '--obj-y': '38%' }} />
               </div>
               <div className="p-4 sm:p-6 bg-white">
                 <p className="text-center text-base sm:text-lg font-semibold text-purple-600">Bhakti Mode ON 📸</p>
@@ -475,45 +387,7 @@ const BirthdayWebsite = () => {
 
           </div>
 
-          {/* Live focus editor (desktop only) */}
-          <div className="hidden md:block fixed right-6 bottom-6 z-50">
-            <div className="bg-white/95 shadow-lg rounded-xl p-3 w-72">
-              <div className="flex justify-between items-center mb-2">
-                <strong className="text-sm">Edit Image Focus</strong>
-                <button onClick={() => setEditorOpen(o => !o)} className="text-xs text-purple-600">{editorOpen ? 'Close' : 'Open'}</button>
-              </div>
-              {editorOpen ? (
-                <div>
-                  <label className="block text-xs text-gray-600">Image</label>
-                  <select value={selectedIndex} onChange={(e) => setSelectedIndex(Number(e.target.value))} className="w-full mb-2 p-1 border rounded">
-                    {photos.map((p, i) => <option value={i} key={p.id}>{i + 1} — {p.caption.slice(0, 18)}</option>)}
-                  </select>
-
-                  <label className="block text-xs text-gray-600">Horizontal (X)</label>
-                  <input type="range" min="0" max="100" value={(parseFloat(focusMap[selectedIndex].x) || 50)} onChange={(e) => updateFocus(selectedIndex, 'x', e.target.value + '%')} className="w-full mb-2" />
-                  <div className="text-xs text-gray-500 mb-2">Value: {focusMap[selectedIndex].x}</div>
-
-                  <label className="block text-xs text-gray-600">Vertical (Y)</label>
-                  <input type="range" min="0" max="100" value={parseFloat(focusMap[selectedIndex].y)} onChange={(e) => updateFocus(selectedIndex, 'y', e.target.value + '%')} className="w-full mb-2" />
-                  <div className="text-xs text-gray-500 mb-2">Value: {focusMap[selectedIndex].y}</div>
-
-                  <div className="flex gap-2">
-                    <button onClick={() => copyInline(selectedIndex)} className="flex-1 bg-purple-600 text-white py-1 rounded">Copy Inline</button>
-                    <button onClick={() => {
-                      try {
-                        localStorage.setItem('anushka.focusMap', JSON.stringify(focusMap));
-                        alert('Saved focus values to browser storage. They will persist on reload.');
-                      } catch (e) {
-                        alert('Unable to save to localStorage. You can still Copy Inline and paste into source.');
-                      }
-                    }} className="flex-1 border rounded">Save</button>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-xs text-gray-500">Open the editor to tweak per-image focus (desktop only). Adjust X/Y and Copy Inline to paste into code.</div>
-              )}
-            </div>
-          </div>
+          {/* Editor removed for production — images use baked inline styles above */}
 
           <button
             onClick={() => setCurrentPage(3)}
@@ -842,7 +716,7 @@ const BirthdayWebsite = () => {
               Anushka, Dayan you bring so much light and joy to everyone especially me.
               Your playful spirit and quirky personality make every moment special.
               You light up my mood whenever I feel down.
-              I like talking to you, doing bakchodi with you, making jokes with you.Here's to celebrating not just your bday, but the incredible person you are
+              I like talking to you, doing bakchodi with you, making jokes with  you . Here's to celebrating not just your bday, but the incredible person  you are 🫰🏻🫰🏻
             </p>
             <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-8">
               Happy 17th Birthday! <SafeIcon Comp={Cake} className="inline-block text-pink-400 mx-2" size={28} /><SafeIcon Comp={Sparkles} className="inline-block text-yellow-300 ml-1" size={24} />
